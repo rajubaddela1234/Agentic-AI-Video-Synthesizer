@@ -1,0 +1,15 @@
+langgraph
+langchain-core
+langchain-groq
+langchain-community
+langchain_tavily
+python-dotenv
+tavily-python
+arxiv
+youtube-search
+PyYAML
+requests
+google-api-python-client
+gTTS
+requests
+
