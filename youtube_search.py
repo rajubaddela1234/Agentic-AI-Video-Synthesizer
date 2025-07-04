@@ -40,7 +40,7 @@ if not groq_api_key:
 try:
     llm = ChatGroq(
         model="meta-llama/llama-4-scout-17b-16e-instruct",  # Using a more common model
-        api_key="REMOVED",
+        api_key=groq_api_key,
         temperature=0.3
     )
     print("✅ LLM initialized successfully")
