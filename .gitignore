@@ -79,4 +79,5 @@ Thumbs.db
 output.mp3
 video_script.txt
 research_report.txt
-detailed_report.txt 
+
+.env
