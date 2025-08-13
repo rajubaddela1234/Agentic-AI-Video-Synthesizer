@@ -1,4 +1,4 @@
-# AI Video Script Research Agent
+git statusgit status# AI Video Script Research Agent
 
 This project is an AI-powered research assistant that generates comprehensive video scripts (6-10 minutes) on any topic by aggregating information from YouTube, web articles, and academic papers. It uses advanced LLMs and multiple APIs to ensure high-quality, well-cited scripts suitable for video content creation.
 
