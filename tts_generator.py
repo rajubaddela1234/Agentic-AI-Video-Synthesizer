@@ -12,4 +12,3 @@ def text_to_speech(script_text: str, output_path: str = 'output.mp3') -> bool:
     except Exception as e:
         print(f" Error: {e}")
         return False
-

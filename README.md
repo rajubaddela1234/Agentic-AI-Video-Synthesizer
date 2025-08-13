@@ -1,52 +1,148 @@
-git statusgit status# AI Video Script Research Agent
+# 🧠 Agentic AI Video Synthesizer
 
-This project is an AI-powered research assistant that generates comprehensive video scripts (6-10 minutes) on any topic by aggregating information from YouTube, web articles, and academic papers. It uses advanced LLMs and multiple APIs to ensure high-quality, well-cited scripts suitable for video content creation.
+An advanced multi-agent AI system that transforms natural language queries into complete educational videos — with research-grounded scripting, TTS narration, and AI avatar rendering.
 
-## Features
-- Multi-source research: YouTube, web, and arXiv academic papers
-- Uses LLM (Meta Llama via Groq API) for synthesis
-- Generates a video script and detailed research report
-- Text-to-speech (TTS) audio generation (output.mp3)
-- Modular, extensible Python codebase
+---
 
-## Project Structure
-- `main.py`: Main entry point. Generates script and audio.
-- `youtube_search.py`: Core research agent. Handles API calls, research graph, and script/report generation.
-- `tts_generator.py`: Converts generated script to speech (MP3).
-- `avatar_video.py`: (video/avatar features)
-- `requirements.txt`: Python dependencies.
-- `output.mp3`: Generated audio file (ignored by git).
-- `video_script.txt`, `research_report.txt`, `detailed_report.txt`: Generated output files (ignored by git).
-- `venv/`: Python virtual environment (ignored by git).
+## 🚀 Overview
 
-## Setup
-1. **Clone the repository**
-2. **Install dependencies**:
-   ```bash
-   pip install -r requirements.txt
-   ```
-3. **Set up API keys**:
-   - Create a `.env` file in the root directory with the following (get keys from Tavily, YouTube, Groq):
-     ```env
-     TAVILY_API_KEY=your_tavily_api_key
-     YOUTUBE_API_KEY=your_youtube_api_key
-     GROQ_API_KEY=your_groq_api_key
-     ```
+Agentic AI Video Synthesizer is an intelligent, multi-stage pipeline that autonomously:
 
-## Usage
-Run the main script:
+1. Understands complex queries
+2. Decomposes them into sub-questions
+3. Gathers accurate data from web, video, and academic sources
+4. Synthesizes a coherent educational script
+5. Converts the script to speech using gTTS
+6. Renders an avatar-narrated video using D-ID
+
+This system is built using **LangGraph**, **Groq-hosted LLaMA 3.3–70B Versatile**, and several modern APIs, and delivered via an interactive **Streamlit** frontend.
+
+---
+
+## 🧩 Features
+
+- ✅ Multi-agent LangGraph orchestration
+- 🔍 Real-time research using:
+  - 🌐 Tavily (Web)
+  - 📺 YouTube (Video Transcripts)
+  - 📚 arXiv (Academic Papers)
+- 📝 Script synthesis grounded in actual retrieved content
+- 🔊 Natural speech generation (gTTS)
+- 👩‍🏫 Avatar video rendering (D-ID)
+- 💾 Downloadable outputs: script, audio, video, citations
+- 📊 Quality evaluation (score, completeness, iterations, source count)
+
+---
+
+## 🛠️ Tech Stack
+
+| Layer                    | Technology                                 |
+|-------------------------|--------------------------------------------|
+| 🧠 LLM Engine            | Groq API with `llama-3.3-70b-versatile`     |
+| 🕸️ Agent Framework       | LangGraph + LangChain                      |
+| 🔎 Retrieval Agents      | Tavily, YouTube API, arXiv API             |
+| 🗣️ Text-to-Speech        | Google Text-to-Speech (gTTS)              |
+| 🎥 Avatar Video          | D-ID API                                   |
+| 🌐 UI & Deployment       | Streamlit                                  |
+| 🐍 Language              | Python 3.11                                |
+
+---
+
+## 📂 Project Structure
+
 ```bash
-python main.py
+├── app.py                 # Streamlit UI
+├── main.py               # LangGraph Orchestration
+├── search.py             # Tool Agent integrations (Tavily, YouTube, arXiv)
+├── tts_generator.py      # gTTS speech synthesis
+├── video.py              # D-ID avatar video handling
+├── .env                  # API keys (excluded from Git)
+├── requirements.txt
 ```
-- Enter your video topic when prompted.
-- The script will generate a research-backed video script and save it to `video_script.txt`.
-- An audio narration will be generated as `output.mp3`.
-- A detailed research report will be saved as `research_report.txt`.
 
-## Notes
-- Ensure your API keys are valid and have sufficient quota.
-- All generated files and virtual environment folders are ignored by git (see `.gitignore`).
-- `avatar_video.py` is a placeholder for future video/avatar generation features.
+---
 
-## License
-MIT License 
+## ⚙️ Setup & Run
+
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/your-username/agentic-ai-video-synthesizer.git
+cd agentic-ai-video-synthesizer
+```
+
+### 2. Create virtual environment
+
+```bash
+python -m venv venv
+source venv/bin/activate  # or venv\Scripts\activate on Windows
+```
+
+### 3. Install dependencies
+
+```bash
+pip install -r requirements.txt
+```
+
+### 4. Configure `.env` file
+
+Create a `.env` file in the root directory with:
+
+```
+GROQ_API_KEY=your_groq_key
+TAVILY_API_KEY=your_tavily_key
+DID_API_KEY=your_did_key
+YOUTUBE_API_KEY=your_youtube_key
+LANGSMITH=your_langsmith_key
+```
+
+### 5. Run the app
+
+```bash
+streamlit run app.py
+```
+
+---
+
+
+
+## 🧪 Evaluation Summary
+
+- Single & multi-question queries tested
+- Real-time research with score-based feedback
+- Metrics include: quality score, iterations, sources used
+- Screenshots and results available in `/screenshots`
+
+---
+
+## 📚 References
+
+- LLaMA 3.3–70B Versatile via Groq
+- Tavily Web Search API
+- YouTube Data API v3
+- arXiv.org API
+- LangGraph by LangChain
+- Google Text-to-Speech
+- D-ID Avatar Rendering
+
+---
+
+## 🙌 Acknowledgements
+
+Special thanks to **Dr. Sameena Naaz** for her insightful feedback and technical guidance on LangGraph agent integration and D-ID video rendering.
+
+---
+
+## 📦 Deliverables
+
+- ✅ Educational Script (.txt)
+- ✅ Audio Narration (.mp3)
+- ✅ AI Avatar Video (.mp4)
+- ✅ Research Report (.txt)
+
+---
+
+## 📌 Status
+
+✅ Functional Prototype | 🧠 Agentic Architecture | 📹 AI-Narrated Videos  
+Ready for educational use and future extensions!
