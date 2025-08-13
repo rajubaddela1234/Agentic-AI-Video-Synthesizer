@@ -44,7 +44,7 @@ This system is built using **LangGraph**, **Groq-hosted LLaMA 3.3–70B Versatil
 | 🗣️ Text-to-Speech        | Google Text-to-Speech (gTTS)              |
 | 🎥 Avatar Video          | D-ID API                                   |
 | 🌐 UI & Deployment       | Streamlit                                  |
-| 🐍 Language              | Python 3.11                                |
+| 🐍 Language              | Python 3.12                              |
 
 ---
 
