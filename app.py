@@ -168,8 +168,11 @@ def run_research_pipeline(user_query):
     }
     
     try:
-        # Execute the research with simple spinner
-        config = {"recursion_limit": 100}
+        # Execute the research with memory configuration
+        config = {
+            "recursion_limit": 100,
+            "configurable": {"thread_id": f"streamlit_session_{hash(user_query) % 10000}"}  # Add this line
+        }
         
         with st.spinner("🧠 Processing your request... This may take a few seconds."):
             final_state = graph.invoke(initial_state, config=config)
@@ -178,7 +181,7 @@ def run_research_pipeline(user_query):
         return final_state
         
     except Exception as e:
-        st.error(f" Research failed: {str(e)}")
+        st.error(f"❌ Research failed: {str(e)}")
         return None
 
 def create_download_zip(script_content, research_report, audio_data, video_data=None):

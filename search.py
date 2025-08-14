@@ -9,6 +9,7 @@ from IPython.display import Image
 from langchain_core.messages import HumanMessage, SystemMessage
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
+from langgraph.checkpoint.memory import MemorySaver
 import os
 import sys
 import json
@@ -632,43 +633,46 @@ class ReactSupervisorAgent(Runnable):
 
 # --- LangChain Prompts  ---
 youtube_analysis_prompt = ChatPromptTemplate.from_messages([
-    ("system", """You are a data summarizer. ONLY summarize and analyze the provided YouTube video content. 
-    
-    IMPORTANT RULES:
-    1. If NO video content is provided or data is empty, respond with exactly: "No YouTube data available"
-    2. Do NOT generate any content from your own knowledge
-    3. ONLY work with the actual video data provided
-    4. Provide comprehensive educational summary ONLY when actual video content exists
-    
-    Focus on extracting meaningful educational value from the provided video titles, descriptions, and transcripts."""),
-    ("human", "Topic: {query}\n\nYouTube Video Content:\n{results}\n\nSummarize the provided data:")
+    ("system", """You are an AI research assistant. Your role is to analyze ONLY the content extracted from YouTube videos.
+
+IMPORTANT RULES:
+1. If the input contains no valid video content, respond with exactly: "No YouTube data available"
+2. Do NOT generate any information that is not present in the provided input.
+3. NEVER hallucinate or speculate; use ONLY the actual video titles, descriptions, and transcripts.
+4. Provide an informative educational summary strictly based on the input content.
+
+Focus on identifying educational insights, explanations, or key takeaways based solely on what is available in the YouTube video data."""),
+    ("human", "User Query: {query}\n\nYouTube Data:\n{results}\n\nGenerate a summary of the above content:")
 ])
+
 
 tavily_analysis_prompt = ChatPromptTemplate.from_messages([
-    ("system", """You are a data summarizer. ONLY summarize and analyze the provided web search results.
-    
-    IMPORTANT RULES:
-    1. If NO web content is provided or data is empty, respond with exactly: "No web data available"
-    2. Do NOT generate any content from your own knowledge
-    3. ONLY work with the actual web data provided
-    4. Provide detailed synthesis ONLY when actual web content exists
-    
-    Focus on extracting valuable information from the provided web articles and search results."""),
-    ("human", "Topic: {query}\n\nWeb Content:\n{results}\n\nSummarize the provided data:")
+    ("system", """You are an AI research assistant specializing in web content analysis. Analyze ONLY the web search results provided.
+
+IMPORTANT RULES:
+1. If the input contains no valid web content, respond with exactly: "No web data available"
+2. Do NOT use any prior knowledge or assumptions.
+3. Your analysis must rely strictly on the supplied titles, summaries, and article content.
+4. Deliver a coherent and accurate synthesis ONLY if valid content is present.
+
+Focus on factual extraction, clarity, and educational relevance from the web content supplied."""),
+    ("human", "User Query: {query}\n\nWeb Content:\n{results}\n\nGenerate a summary of the above content:")
 ])
 
+
 arxiv_analysis_prompt = ChatPromptTemplate.from_messages([
-    ("system", """You are a data summarizer. ONLY summarize and analyze the provided academic research papers.
-    
-    IMPORTANT RULES:
-    1. If NO academic content is provided or data is empty, respond with exactly: "No academic data available"
-    2. Do NOT generate any content from your own knowledge  
-    3. ONLY work with the actual paper data provided
-    4. Provide detailed academic analysis ONLY when actual research papers exist
-    
-    Focus on extracting research-based knowledge from the provided academic papers and abstracts."""),
-    ("human", "Topic: {query}\n\nAcademic Content:\n{results}\n\nSummarize the provided data:")
+    ("system", """You are an AI research assistant trained to analyze academic material. You MUST use ONLY the abstracts and metadata provided.
+
+IMPORTANT RULES:
+1. If the input contains no academic data, respond with exactly: "No academic data available"
+2. Do NOT generate speculative information or refer to knowledge outside the provided papers.
+3. Use ONLY the content present in abstracts, titles, and metadata.
+4. Generate an academically sound summary ONLY if valid research content is provided.
+
+Focus on extracting relevant technical insights, findings, or theoretical contributions from the given academic papers."""),
+    ("human", "User Query: {query}\n\nAcademic Paper Content:\n{results}\n\nGenerate a summary of the above academic material:")
 ])
+
 
 synthesis_prompt = ChatPromptTemplate.from_messages([
    ("system", """You are a script writer creating clean, spoken content for educational videos.
@@ -1069,6 +1073,8 @@ class TavilyAgent(Runnable):
             "all_intermediate_answers": all_answers,
             "question_answers": question_answers
         }
+    
+
 # ---  ArXiv Agent ---
 class ArxivAgent(Runnable):
     def invoke(self, state: VideoState, config=None):
@@ -1131,7 +1137,7 @@ class ArxivAgent(Runnable):
                             # Fallback to original abstract
                             original_abstract = paper.get("abstract", "")
                             if original_abstract:
-                                academic_content += f"Abstract: {original_abstract[:3000]}...\n"
+                                academic_content += f"Abstract: {original_abstract[:5000]}...\n"
                         
                         academic_content += "\n" + "="*60 + "\n"
                     
@@ -1561,6 +1567,9 @@ def router(state: VideoState) -> Literal["question_decomposer", "react_superviso
 
 # --- Graph Builder ---
 def build_research_graph():
+    # Initialize memory
+    memory = MemorySaver()
+    
     builder = StateGraph(VideoState)
     
     # Add all nodes
@@ -1586,7 +1595,8 @@ def build_research_graph():
     builder.add_conditional_edges("synthesis_agent", router)
     builder.add_conditional_edges("feedback_agent", router)
     
-    return builder.compile()
+    # Compile with memory
+    return builder.compile(checkpointer=memory)
 
 
 def visualize_workflow(graph):
@@ -1688,7 +1698,7 @@ def format_citations(citations: List[Dict[str, str]], question_answers: Dict[str
     
     return formatted
 
-# --- All Answers Formatter (Updated) ---
+# --- All Answers Formatter ---
 def format_all_answers(all_answers: List[Dict[str, str]], feedback_info: Dict[str, Any]) -> str:
     if not all_answers:
         return "No intermediate answers were generated."
@@ -1811,7 +1821,10 @@ def main():
     
     try:
         # Execute the graph
-        config = {"recursion_limit": 100}
+        config = {
+            "recursion_limit": 100,
+            "configurable": {"thread_id": "research_session_1"}  # Add this line
+        }
         final_state = graph.invoke(initial_state, config=config)
         
         # Extract results
